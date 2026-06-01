@@ -5173,12 +5173,14 @@ int xschem(ClientData clientdata, Tcl_Interp *interp, int argc, const char * arg
      *      1 : select matching instances
      *     -1 : unselect matching instances
      *   'tok' set as:
+             <attr> : will search for 'val' in instance attribute 'attr'
      *       propstring : will search for 'val' in the entire
      *       *instance* attribute string.
+     *       txt_ptr : this is used to search only the txt_ptr string of text pbjects
      *       cell::propstring : will search for 'val' in the entire
      *       *symbol* attribute string.
      *       cell::name : will search for 'val' in the symbol name
-     *       cell::<attr> will search for 'val' in symbol attribute 'attr'
+     *       cell::<attr> : will search for 'val' in symbol attribute 'attr'
      *         example: xschem search regex 0 cell::template GAIN=100
      *    if 'no_match_case' is specified do not consider case sensitivity in search
      *    if 'nodraw' is specified do not draw search result
