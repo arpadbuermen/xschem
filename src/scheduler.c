@@ -1582,11 +1582,11 @@ int xschem(ClientData clientdata, Tcl_Interp *interp, int argc, const char * arg
               if(c >=0 && c < cadlayers) {
                 Tcl_SetResult(interp, my_itoa(xctx->lines[c]),TCL_VOLATILE);
               } else {
-                Tcl_SetResult(interp, "xschem get rects n: layer number out of range", TCL_STATIC);
+                Tcl_SetResult(interp, "xschem get lines n: layer number out of range", TCL_STATIC);
                 return TCL_ERROR;
               }
             } else {
-              Tcl_SetResult(interp, "xschem get rects n: give a layer number", TCL_STATIC);
+              Tcl_SetResult(interp, "xschem get lines n: give a layer number", TCL_STATIC);
               return TCL_ERROR;
             }
           }
@@ -5370,6 +5370,26 @@ int xschem(ClientData clientdata, Tcl_Interp *interp, int argc, const char * arg
       y2 = atof(argv[5]);
       select_inside(tclgetboolvar("enable_stretch"), x1, y1, x2, y2, sel);
       Tcl_ResetResult(interp);
+    }
+
+    /* selected_rect
+     *  Return list of {color index} of selected rects */
+    else if(!strcmp(argv[1], "selected_rect"))
+    {
+      int n, i, c, first = 1;
+      char cstr[40];
+      if(!xctx) {Tcl_SetResult(interp, not_avail, TCL_STATIC); return TCL_ERROR;}
+      rebuild_selected_array();
+      for(n=0; n < xctx->lastsel; ++n) {
+        if(xctx->sel_array[n].type == xRECT) {
+          i = xctx->sel_array[n].n;
+          c = xctx->sel_array[n].col;
+          my_snprintf(cstr, S(cstr), "%d", c);
+          if(first == 0)  Tcl_AppendResult(interp, " ", NULL);
+          Tcl_AppendResult(interp, "{", cstr, " ", my_itoa(i), "}", NULL);
+          first = 0;
+        }
+      }
     }
 
     /* selected_set [what]
