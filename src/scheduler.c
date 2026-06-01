@@ -5417,6 +5417,22 @@ int xschem(ClientData clientdata, Tcl_Interp *interp, int argc, const char * arg
         }
       }
     }
+    /* selected_text
+     *  Return list of selected texts */
+    else if(!strcmp(argv[1], "selected_text"))
+    {
+      int n, i, first = 1;
+      if(!xctx) {Tcl_SetResult(interp, not_avail, TCL_STATIC); return TCL_ERROR;}
+      rebuild_selected_array();
+      for(n=0; n < xctx->lastsel; ++n) {
+        if(xctx->sel_array[n].type == xTEXT) {
+          i = xctx->sel_array[n].n;
+          if(first == 0)  Tcl_AppendResult(interp, " ", NULL);
+          Tcl_AppendResult(interp, my_itoa(i), NULL);
+          first = 0;
+        }
+      }
+    }
 
     /* selected_wire
      *  Return list of selected nets */
