@@ -9950,7 +9950,7 @@ proc show_bindkeys {} {
 }
 
 proc set_bindings {topwin} {
-global env has_x OS autofocus_mainwindow
+global env has_x OS autofocus_mainwindow replace_key
   ###
   ### Tk event handling
   ###
@@ -9978,14 +9978,74 @@ global env has_x OS autofocus_mainwindow
     bind $topwin <Expose> "if {{%W} eq {$topwin}} {xschem callback %W %T %x %y 0 %w %h %s}"
 
     # transform mousewheel events into button4/5 events
-    if {[info tclversion] > 8.7} {
-      bind $topwin <MouseWheel> {
-        if {%D > 0} {
-          xschem callback %W 4 %x %y 0 4 0 %s
+    if {[info tclversion] >= 8.7} {
+      set zoom_state 0
+      set vert_pan_state 4
+      set horiz_pan_state 1
+      # transform mouse wheel modifier key remapping into MouseWheel equivalents
+      if {[info exist replace_key(Button-4)]} {
+        if {[regexp {Control} $replace_key(Button-4)]} {
+          set zoom_state 4
+        } elseif {[regexp {Shift} $replace_key(Button-4)]} {
+          set zoom_state 1
         } else {
-          xschem callback %W 4 %x %y 0 5 0 %s
+          set zoom_state 0
         }
       }
+  
+      if {[info exist replace_key(Shift-Button-4)]} {
+        if {[regexp {Control} $replace_key(Shift-Button-4)]} {
+          set horiz_pan_state 4
+        } elseif {[regexp {Shift} $replace_key(Shift-Button-4)]} {
+          set horiz_pan_state 1
+        } else {
+          set horiz_pan_state 0
+        }
+      } 
+  
+      if {[info exist replace_key(Control-Button-4)]} {
+        if {[regexp {Control} $replace_key(Control-Button-4)]} {
+          set vert_pan_state 4
+        } elseif {[regexp {Shift} $replace_key(Control-Button-4)]} {
+          set vert_pan_state 1
+        } else {
+          set vert_pan_state 0
+        }
+      }
+
+      bind $topwin <MouseWheel> "
+        # puts \"MouseWheel: %D\"
+        if {%D > 0} {
+          # zoom in
+          xschem callback %W 4 %x %y 0 4 0 $zoom_state
+        } else {
+          # zoom out
+          xschem callback %W 4 %x %y 0 5 0 $zoom_state
+        }
+      "
+
+      bind $topwin <Shift-MouseWheel> "
+        # puts \"Shift-MouseWheel: %D\"
+        if {%D > 0} {
+          # pan to the right; move schematic to left
+          xschem callback %W 4 %x %y 0 4 0 $horiz_pan_state
+        } else {
+          # pan to the left; move schematic to right
+          xschem callback %W 4 %x %y 0 5 0 $horiz_pan_state
+        }
+      "
+
+      bind $topwin <Control-MouseWheel> "
+        # puts \"Ctrl-MouseWheel: %D\"
+        if {%D > 0} {
+          # pan down; move schematic up
+          xschem callback %W 4 %x %y 0 4 0 $vert_pan_state
+        } else {
+          # pan up; move schematic down
+          xschem callback %W 4 %x %y 0 5 0 $vert_pan_state
+        }
+      "
+
     }
 
     bind $topwin <Double-Button-1> "xschem callback %W -3 %x %y 0 %b 0 %s"

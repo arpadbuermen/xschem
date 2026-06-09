@@ -2196,6 +2196,7 @@ static int handle_mouse_wheel(int event, int mx, int my, KeySym key, int button,
       waves_callback(event, mx, my, key, button, aux, state);
       return 1;
     }
+     /* zoom out */
      view_unzoom(CADZOOMSTEP);
      return 0;
    }
@@ -2204,6 +2205,7 @@ static int handle_mouse_wheel(int event, int mx, int my, KeySym key, int button,
       waves_callback(event, mx, my, key, button, aux, state);
       return 1;
     }
+     /* zoom in */
      view_zoom(CADZOOMSTEP);
      return 0;
    }
@@ -2213,6 +2215,7 @@ static int handle_mouse_wheel(int event, int mx, int my, KeySym key, int button,
         waves_callback(event, mx, my, key, button, aux, state);
         return 1;
       }
+      /* pan to the right; move schematic to left */
       xctx->xorigin+=-CADMOVESTEP*xctx->zoom/2.;
       draw();
       redraw_w_a_l_r_p_z_rubbers(1);
@@ -2222,16 +2225,20 @@ static int handle_mouse_wheel(int event, int mx, int my, KeySym key, int button,
         waves_callback(event, mx, my, key, button, aux, state);
         return 1;
       }
+
+      /* pan to the left; move schematic to right */
       xctx->xorigin-=-CADMOVESTEP*xctx->zoom/2.;
       draw();
       redraw_w_a_l_r_p_z_rubbers(1);
      }
      else if(button==Button4 && (state & ControlMask) && !(state & Button2Mask)) {
+      /* pan down; move schematic up */
       xctx->yorigin+=-CADMOVESTEP*xctx->zoom/2.;
       draw();
       redraw_w_a_l_r_p_z_rubbers(1);
      }
      else if(button==Button5 && (state & ControlMask) && !(state & Button2Mask)) {
+      /* pan up; move schematic down */
       xctx->yorigin-=-CADMOVESTEP*xctx->zoom/2.;
       draw();
       redraw_w_a_l_r_p_z_rubbers(1);
